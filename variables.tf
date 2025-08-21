@@ -356,6 +356,7 @@ variable "azure_monitor_private_link_scope_resource_group_name" {
 variable "azure_monitor_private_link_scope_name" {
   type = string
   description = "The name of the Azure Monitor Private Link Scope that will be created."
+  default = null
 }
 
 variable "azure_monitor_private_link_scope_ingestion_access_mode" {
