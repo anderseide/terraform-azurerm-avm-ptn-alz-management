@@ -15,6 +15,6 @@ module mgmt_virtual_network {
   location = var.location
   name = var.management_virtual_network_name
   address_space = var.management_virtual_network_address_space
-  resource_group_name = azurerm_resource_group.management_virtual_network.name
+  resource_group_name = azurerm_resource_group.management_virtual_network[0].name
 
 }
