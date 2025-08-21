@@ -341,3 +341,68 @@ The value of this variable is an object with the following attributes:
   - tags (Optional) - A map of tags to apply to the user assigned managed identity. Defaults to `null`.
 DESCRIPTION
 }
+
+variable "azure_monitor_private_link_scope_enabled" {
+  type = bool
+  description = "A boolean flag to determine if Azure Monitor Private Link Scope should be enabled."
+  default = false
+}
+
+variable "azure_monitor_private_link_scope_resource_group_name" {
+  type = string
+  description = "The name of the Azure Resource Group where Azure Monitor Private Link Scope will be created."
+}
+
+variable "azure_monitor_private_link_scope_name" {
+  type = string
+  description = "The name of the Azure Monitor Private Link Scope that will be created."
+}
+
+variable "azure_monitor_private_link_scope_ingestion_access_mode" {
+  type = string
+  description = "The default ingestion access mode for the associated private endpoints in scope."
+  default = "PrivateOnly"
+  validation {
+    condition = contains(["Open", "PrivateOnly"], var.azure_monitor_private_link_scope_ingestion_access_mode)
+    error_message = "Possible values are Open and PrivateOnly."
+  }
+}
+
+variable "azure_monitor_private_link_scope_query_access_mode" {
+  type = string
+  description = "The default query access mode for the associated private endpoints in scope."
+  default = "PrivateOnly"
+  validation {
+    condition = contains(["Open", "PrivateOnly"], var.azure_monitor_private_link_scope_query_access_mode)
+    error_message = "Possible values are Open and PrivateOnly."
+  }
+}
+
+variable "management_virtual_network_enabled" {
+  type = bool
+  description = "(Optional). A boolean flag to determine if Management subscription should have virtual network deployed."
+  default = false
+}
+
+variable "management_virtual_network_name_resource_group" {
+  type        = string
+  default     = null
+  description = "(Optional). Name of the resource group holding the virtual network in management subscription."
+}
+
+variable "management_virtual_network_name" {
+  type        = string
+  default     = null
+  description = "(Optional). Name of the virtual network in management subscription."
+}
+
+variable "management_virtual_network_address_space" {
+  type        = set(string)
+  description = "(Optional). The address spaces applied to the virtual network. You can supply more than one address space."
+  nullable    = false
+
+  validation {
+    condition     = length(var.management_virtual_network_address_space) > 0
+    error_message = "Address space must contain at least one element."
+  }
+}
