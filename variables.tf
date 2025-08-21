@@ -386,7 +386,7 @@ variable "management_virtual_network_enabled" {
   default = false
 }
 
-variable "management_virtual_network_name_resource_group" {
+variable "management_virtual_network_resource_group_name" {
   type        = string
   default     = null
   description = "(Optional). Name of the resource group holding the virtual network in management subscription."
