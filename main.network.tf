@@ -2,7 +2,7 @@ resource "azurerm_resource_group" "management_virtual_network" {
   count = var.management_virtual_network_enabled ? 1 : 0
 
   location = var.location
-  name     = var.management_virtual_network_name_resource_group ? var.management_virtual_network_name_resource_group : "rg-management-vnet-${var.location}"
+  name = (var.management_virtual_network_name_resource_group != "") ? var.management_virtual_network_name_resource_group : "rg-management-vnet-${var.location}"
   tags     = var.tags
 }
 
