@@ -351,6 +351,7 @@ variable "azure_monitor_private_link_scope_enabled" {
 variable "azure_monitor_private_link_scope_resource_group_name" {
   type = string
   description = "The name of the Azure Resource Group where Azure Monitor Private Link Scope will be created."
+  default = null
 }
 
 variable "azure_monitor_private_link_scope_name" {

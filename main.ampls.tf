@@ -17,12 +17,3 @@ resource "azurerm_monitor_private_link_scope" "azure_monitor_private_link_scope"
   ingestion_access_mode = var.azure_monitor_private_link_scope_ingestion_access_mode
   query_access_mode = var.azure_monitor_private_link_scope_query_access_mode
 }
-
-resource "azurerm_monitor_private_link_scoped_service" "azure_monitor_private_link_scoped_service" {
-
-  name = ""
-  resource_group_name = azurerm_resource_group.azure_monitor_private_link_scope.name
-  scope_name = ""
-  linked_resource_id = ""
-
-}
