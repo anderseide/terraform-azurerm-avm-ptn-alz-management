@@ -31,7 +31,7 @@ module "avm-res-network-privateendpoint" {
   subnet_resource_id = module.mgmt_virtual_network[0].subnets["snet-ampls"].resource_id
   resource_group_name = azurerm_resource_group.azure_monitor_private_link_scope[0].name
   network_interface_name = "nic-${var.azure_monitor_private_link_scope_name}-${var.location}"
-  private_dns_zone_group_name = try(var.azure_monitor_private_link_scope_dns_zone_group_name, "default")
+  private_dns_zone_group_name = var.azure_monitor_private_link_scope_dns_zone_group_name != null ? var.azure_monitor_private_link_scope_dns_zone_group_name : "default"
   private_dns_zone_resource_ids = var.azure_monitor_private_link_scope_dns_zone_resource_ids
   subresource_names = ["azuremonitor"]
 }
