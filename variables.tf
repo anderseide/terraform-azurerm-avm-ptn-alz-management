@@ -3,10 +3,26 @@ variable "automation_account_name" {
   description = "The name of the Azure Automation Account to create."
 }
 
+variable "azure_monitor_private_link_scope_dns_zone_resource_ids" {
+  type        = list(string)
+  description = "(Required). The list of private DNS zone resource IDs for the Azure Monitor Private Link Scope."
+}
+
 variable "location" {
   type        = string
   description = "The Azure region where the resources will be deployed."
   nullable    = false
+}
+
+variable "management_virtual_network_address_space" {
+  type        = set(string)
+  description = "(Optional). The address spaces applied to the virtual network. You can supply more than one address space."
+  nullable    = false
+
+  validation {
+    condition     = length(var.management_virtual_network_address_space) > 0
+    error_message = "Address space must contain at least one element."
+  }
 }
 
 variable "resource_group_name" {
@@ -58,6 +74,52 @@ variable "automation_account_sku_name" {
   default     = "Basic"
   description = "The name of the SKU for the Azure Automation Account to create."
   nullable    = false
+}
+
+variable "azure_monitor_private_link_scope_dns_zone_group_name" {
+  type        = string
+  default     = null
+  description = "(Optional). The name of the private DNS zone group for the Azure Monitor Private Link Scope."
+}
+
+variable "azure_monitor_private_link_scope_enabled" {
+  type        = bool
+  default     = false
+  description = "A boolean flag to determine if Azure Monitor Private Link Scope should be enabled."
+}
+
+variable "azure_monitor_private_link_scope_ingestion_access_mode" {
+  type        = string
+  default     = "PrivateOnly"
+  description = "The default ingestion access mode for the associated private endpoints in scope."
+
+  validation {
+    condition     = contains(["Open", "PrivateOnly"], var.azure_monitor_private_link_scope_ingestion_access_mode)
+    error_message = "Possible values are Open and PrivateOnly."
+  }
+}
+
+variable "azure_monitor_private_link_scope_name" {
+  type        = string
+  default     = null
+  description = "The name of the Azure Monitor Private Link Scope that will be created."
+}
+
+variable "azure_monitor_private_link_scope_query_access_mode" {
+  type        = string
+  default     = "PrivateOnly"
+  description = "The default query access mode for the associated private endpoints in scope."
+
+  validation {
+    condition     = contains(["Open", "PrivateOnly"], var.azure_monitor_private_link_scope_query_access_mode)
+    error_message = "Possible values are Open and PrivateOnly."
+  }
+}
+
+variable "azure_monitor_private_link_scope_resource_group_name" {
+  type        = string
+  default     = null
+  description = "The name of the Azure Resource Group where Azure Monitor Private Link Scope will be created."
 }
 
 variable "data_collection_rules" {
@@ -253,154 +315,10 @@ variable "log_analytics_workspace_sku" {
   nullable    = false
 }
 
-variable "resource_group_creation_enabled" {
-  type        = bool
-  default     = true
-  description = "A boolean flag to determine whether to deploy the Azure Resource Group or not."
-  nullable    = false
-}
-
-variable "sentinel_onboarding" {
-  type = object({
-    name                         = optional(string, "default")
-    customer_managed_key_enabled = optional(bool, false)
-  })
-  default     = {}
-  description = <<DESCRIPTION
-Enables customisation of the Sentinel onboarding. Set to `null` to disable.
-
-This is an object with the following attributes:
-
-- name (Optional) - The name of the Sentinel onboarding object. Defaults to `default`.
-- customer_managed_key_enabled (Optional) - Whether or not to enable customer-managed keys for the Sentinel onboarding. Defaults to `false`.
-DESCRIPTION
-}
-
-variable "tags" {
-  type        = map(string)
-  default     = null
-  description = "A map of tags to apply to the resources created."
-}
-
-variable "timeouts" {
-  type = object({
-    sentinel_onboarding = optional(object({
-      create = optional(string, "5m")
-      delete = optional(string, "5m")
-      update = optional(string, "5m")
-      read   = optional(string, "5m")
-      }), {}
-    )
-    data_collection_rule = optional(object({
-      create = optional(string, "5m")
-      delete = optional(string, "10m")
-      update = optional(string, "5m")
-      read   = optional(string, "5m")
-      }), {}
-    )
-  })
-  default     = {}
-  description = <<DESCRIPTION
-A map of timeouts to apply to the creation and destruction of resources.
-If using retry, the maximum elapsed retry time is governed by this value.
-
-The object has attributes for each resource type, with the following optional attributes:
-
-- `create` - (Optional) The timeout for creating the resource. Defaults to `5m`.
-- `delete` - (Optional) The timeout for deleting the resource. Defaults to `5m` apart from data_collection_rule, where this is set to `10m`.
-- `update` - (Optional) The timeout for updating the resource. Defaults to `5m`.
-- `read` - (Optional) The timeout for reading the resource. Defaults to `5m`.
-
-Each time duration is parsed using this function: <https://pkg.go.dev/time#ParseDuration>.
-DESCRIPTION
-}
-
-variable "user_assigned_managed_identities" {
-  type = object({
-    ama = object({
-      enabled  = optional(bool, true)
-      name     = string
-      location = optional(string, null)
-      tags     = optional(map(string), null)
-    })
-  })
-  default = {
-    ama = {
-      name = "uami-ama"
-    }
-  }
-  description = <<DESCRIPTION
-Enables customisation of the user assigned managed identities.
-
-The value of this variable is an object with the following attributes:
-
-- ama (Required) - The user assigned managed identity for the Azure Monitor Agent.
-  - enabled (Optional) - Whether or not to create the user assigned managed identity. Defaults to `true`.
-  - name (Required) - The name of the user assigned managed identity, the variable default value is `uami-ama`.
-  - location (Optional) - The Azure region of the user assigned managed identity. Defaults to the value of the location variable.
-  - tags (Optional) - A map of tags to apply to the user assigned managed identity. Defaults to `null`.
-DESCRIPTION
-}
-
-variable "azure_monitor_private_link_scope_enabled" {
-  type = bool
-  description = "A boolean flag to determine if Azure Monitor Private Link Scope should be enabled."
-  default = false
-}
-
-variable "azure_monitor_private_link_scope_resource_group_name" {
-  type = string
-  description = "The name of the Azure Resource Group where Azure Monitor Private Link Scope will be created."
-  default = null
-}
-
-variable "azure_monitor_private_link_scope_name" {
-  type = string
-  description = "The name of the Azure Monitor Private Link Scope that will be created."
-  default = null
-}
-
-variable "azure_monitor_private_link_scope_ingestion_access_mode" {
-  type = string
-  description = "The default ingestion access mode for the associated private endpoints in scope."
-  default = "PrivateOnly"
-  validation {
-    condition = contains(["Open", "PrivateOnly"], var.azure_monitor_private_link_scope_ingestion_access_mode)
-    error_message = "Possible values are Open and PrivateOnly."
-  }
-}
-
-variable "azure_monitor_private_link_scope_query_access_mode" {
-  type = string
-  description = "The default query access mode for the associated private endpoints in scope."
-  default = "PrivateOnly"
-  validation {
-    condition = contains(["Open", "PrivateOnly"], var.azure_monitor_private_link_scope_query_access_mode)
-    error_message = "Possible values are Open and PrivateOnly."
-  }
-}
-
-variable "azure_monitor_private_link_scope_dns_zone_group_name" {
-  type        = string
-  default     = null
-  description = "(Optional). The name of the private DNS zone group for the Azure Monitor Private Link Scope."
-}
-
-variable "azure_monitor_private_link_scope_dns_zone_resource_ids" {
-  type        = list(string)
-  description = "(Required). The list of private DNS zone resource IDs for the Azure Monitor Private Link Scope."
-}
-
 variable "management_virtual_network_enabled" {
-  type = bool
+  type        = bool
+  default     = false
   description = "(Optional). A boolean flag to determine if Management subscription should have virtual network deployed."
-  default = false
-}
-
-variable "management_virtual_network_resource_group_name" {
-  type        = string
-  default     = null
-  description = "(Optional). Name of the resource group holding the virtual network in management subscription."
 }
 
 variable "management_virtual_network_name" {
@@ -408,18 +326,6 @@ variable "management_virtual_network_name" {
   default     = null
   description = "(Optional). Name of the virtual network in management subscription."
 }
-
-variable "management_virtual_network_address_space" {
-  type        = set(string)
-  description = "(Optional). The address spaces applied to the virtual network. You can supply more than one address space."
-  nullable    = false
-
-  validation {
-    condition     = length(var.management_virtual_network_address_space) > 0
-    error_message = "Address space must contain at least one element."
-  }
-}
-
 
 variable "management_virtual_network_peerings" {
   type = map(object({
@@ -527,6 +433,12 @@ variable "management_virtual_network_peerings" {
 
 DESCRIPTION
   nullable    = false
+}
+
+variable "management_virtual_network_resource_group_name" {
+  type        = string
+  default     = null
+  description = "(Optional). Name of the resource group holding the virtual network in management subscription."
 }
 
 variable "management_virtual_network_subnets" {
@@ -644,4 +556,93 @@ DESCRIPTION
     condition     = alltrue([for _, subnet in var.management_virtual_network_subnets : subnet.address_prefix != null || subnet.address_prefixes != null])
     error_message = "One of `address_prefix` or `address_prefixes` must be set."
   }
+}
+
+variable "resource_group_creation_enabled" {
+  type        = bool
+  default     = true
+  description = "A boolean flag to determine whether to deploy the Azure Resource Group or not."
+  nullable    = false
+}
+
+variable "sentinel_onboarding" {
+  type = object({
+    name                         = optional(string, "default")
+    customer_managed_key_enabled = optional(bool, false)
+  })
+  default     = {}
+  description = <<DESCRIPTION
+Enables customisation of the Sentinel onboarding. Set to `null` to disable.
+
+This is an object with the following attributes:
+
+- name (Optional) - The name of the Sentinel onboarding object. Defaults to `default`.
+- customer_managed_key_enabled (Optional) - Whether or not to enable customer-managed keys for the Sentinel onboarding. Defaults to `false`.
+DESCRIPTION
+}
+
+variable "tags" {
+  type        = map(string)
+  default     = null
+  description = "A map of tags to apply to the resources created."
+}
+
+variable "timeouts" {
+  type = object({
+    sentinel_onboarding = optional(object({
+      create = optional(string, "5m")
+      delete = optional(string, "5m")
+      update = optional(string, "5m")
+      read   = optional(string, "5m")
+      }), {}
+    )
+    data_collection_rule = optional(object({
+      create = optional(string, "5m")
+      delete = optional(string, "10m")
+      update = optional(string, "5m")
+      read   = optional(string, "5m")
+      }), {}
+    )
+  })
+  default     = {}
+  description = <<DESCRIPTION
+A map of timeouts to apply to the creation and destruction of resources.
+If using retry, the maximum elapsed retry time is governed by this value.
+
+The object has attributes for each resource type, with the following optional attributes:
+
+- `create` - (Optional) The timeout for creating the resource. Defaults to `5m`.
+- `delete` - (Optional) The timeout for deleting the resource. Defaults to `5m` apart from data_collection_rule, where this is set to `10m`.
+- `update` - (Optional) The timeout for updating the resource. Defaults to `5m`.
+- `read` - (Optional) The timeout for reading the resource. Defaults to `5m`.
+
+Each time duration is parsed using this function: <https://pkg.go.dev/time#ParseDuration>.
+DESCRIPTION
+}
+
+variable "user_assigned_managed_identities" {
+  type = object({
+    ama = object({
+      enabled  = optional(bool, true)
+      name     = string
+      location = optional(string, null)
+      tags     = optional(map(string), null)
+    })
+  })
+  default = {
+    ama = {
+      name = "uami-ama"
+    }
+  }
+  description = <<DESCRIPTION
+Enables customisation of the user assigned managed identities.
+
+The value of this variable is an object with the following attributes:
+
+- ama (Required) - The user assigned managed identity for the Azure Monitor Agent.
+  - enabled (Optional) - Whether or not to create the user assigned managed identity. Defaults to `true`.
+  - name (Required) - The name of the user assigned managed identity, the variable default value is `uami-ama`.
+  - location (Optional) - The Azure region of the user assigned managed identity. Defaults to the value of the location variable.
+  - tags (Optional) - A map of tags to apply to the user assigned managed identity. Defaults to `null`.
+DESCRIPTION
 }
