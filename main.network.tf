@@ -17,4 +17,6 @@ module mgmt_virtual_network {
   address_space = var.management_virtual_network_address_space
   resource_group_name = azurerm_resource_group.management_virtual_network[0].name
 
+  subnets = var.management_virtual_network_subnets
+  peerings = var.management_virtual_network_peerings
 }
