@@ -630,7 +630,7 @@ variable "management_virtual_network_subnets" {
 DESCRIPTION
 
   validation {
-    condition     = alltrue([for _, subnet in var.subnets : subnet.address_prefix != null || subnet.address_prefixes != null])
+    condition     = alltrue([for _, subnet in var.management_virtual_network_subnets : subnet.address_prefix != null || subnet.address_prefixes != null])
     error_message = "One of `address_prefix` or `address_prefixes` must be set."
   }
 }
