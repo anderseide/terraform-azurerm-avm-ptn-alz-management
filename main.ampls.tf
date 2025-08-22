@@ -28,7 +28,7 @@ module "avm-res-network-privateendpoint" {
   name = "pe-${var.azure_monitor_private_link_scope_name}-${var.location}"
 
   private_connection_resource_id = azurerm_monitor_private_link_scope.azure_monitor_private_link_scope[0].id
-  subnet_resource_id = mgmt_virtual_network.subnets["snet-ampls"].id
+  subnet_resource_id = module.mgmt_virtual_network.subnets["snet-ampls"].id
   resource_group_name = azurerm_resource_group.azure_monitor_private_link_scope[0].name
   network_interface_name = "nic-${var.azure_monitor_private_link_scope_name}-${var.location}"
   private_dns_zone_group_name = try(var.azure_monitor_private_link_scope_dns_zone_group_name, "default")
