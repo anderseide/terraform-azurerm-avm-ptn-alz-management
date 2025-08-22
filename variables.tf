@@ -380,6 +380,17 @@ variable "azure_monitor_private_link_scope_query_access_mode" {
   }
 }
 
+variable "azure_monitor_private_link_scope_dns_zone_group_name" {
+  type        = string
+  default     = null
+  description = "(Optional). The name of the private DNS zone group for the Azure Monitor Private Link Scope."
+}
+
+variable "azure_monitor_private_link_scope_dns_zone_resource_ids" {
+  type        = list(string)
+  description = "(Required). The list of private DNS zone resource IDs for the Azure Monitor Private Link Scope."
+}
+
 variable "management_virtual_network_enabled" {
   type = bool
   description = "(Optional). A boolean flag to determine if Management subscription should have virtual network deployed."
